@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import net.sourceforge.pmd.lang.ast.SimpleCharStream;
 import net.sourceforge.pmd.lang.plsql.ast.PLSQLParserConstants;
@@ -20,11 +21,14 @@ public class PLSQLTokenizer implements Tokenizer {
     public static final String IGNORE_COMMENTS = "ignore_comments";
     public static final String IGNORE_IDENTIFIERS = "ignore_identifiers";
     public static final String IGNORE_LITERALS = "ignore_literals";
+    
+    private static final String EMPTY_STRING = "";
 
     private boolean ignoreComments;
     private boolean ignoreIdentifiers;
     private boolean ignoreLiterals;
-
+    private Pattern skipBlocksPattern;
+    
     public void setProperties(Properties properties) {
         /*
          * The Tokenizer is derived from PLDoc, in which comments are very
@@ -35,6 +39,10 @@ public class PLSQLTokenizer implements Tokenizer {
         ignoreComments = Boolean.parseBoolean(properties.getProperty(IGNORE_COMMENTS, "true"));
         ignoreIdentifiers = Boolean.parseBoolean(properties.getProperty(IGNORE_IDENTIFIERS, "false"));
         ignoreLiterals = Boolean.parseBoolean(properties.getProperty(IGNORE_LITERALS, "false"));
+        String skipBlocksPatternString = properties.getProperty(OPTION_SKIP_BLOCKS_PATTERN);
+        if (skipBlocksPatternString != null) {
+            skipBlocksPattern = Pattern.compile(skipBlocksPatternString, Pattern.MULTILINE | Pattern.DOTALL);
+        }
     }
 
     public void setIgnoreComments(boolean ignore) {
@@ -73,8 +81,12 @@ public class PLSQLTokenizer implements Tokenizer {
         String fileName = sourceCode.getFileName();
         StringBuilder sb = sourceCode.getCodeBuffer();
 
-        PLSQLParserTokenManager tokenMgr = new PLSQLParserTokenManager(
-                new SimpleCharStream(new StringReader(sb.toString())));
+        String replaced = sb.toString();
+        if (skipBlocksPattern != null) {
+            replaced = skipBlocksPattern.matcher(replaced).replaceAll(EMPTY_STRING);
+        }
+
+        PLSQLParserTokenManager tokenMgr = new PLSQLParserTokenManager(new SimpleCharStream(new StringReader(replaced)));
         Token currentToken = tokenMgr.getNextToken();
         while (currentToken.image.length() > 0) {
             String image = currentToken.image;

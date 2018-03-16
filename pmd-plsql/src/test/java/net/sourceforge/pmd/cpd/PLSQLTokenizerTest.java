@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.cpd;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -15,6 +16,7 @@ import net.sourceforge.pmd.testframework.AbstractTokenizerTest;
 public class PLSQLTokenizerTest extends AbstractTokenizerTest {
 
     private static final String FILENAME = "sample-plsql.sql";
+    private static final String FILENAME_ADVANCED = "sample-plsql-advanced.sql";
 
     @Before
     @Override
@@ -31,6 +33,16 @@ public class PLSQLTokenizerTest extends AbstractTokenizerTest {
     @Test
     public void tokenizeTest() throws IOException {
         this.expectedTokenCount = 1422;
+        super.tokenizeTest();
+    }
+
+    @Test
+    public void skipBlocksTokenizeTest() throws IOException {
+        final Properties properties = new Properties();
+        properties.setProperty(Tokenizer.OPTION_SKIP_BLOCKS_PATTERN, "^\\s*log.log_parameter_einfuegen.+?\\);\\s*$");
+        ((PLSQLTokenizer) this.tokenizer).setProperties(properties);
+        this.sourceCode = new SourceCode(new SourceCode.StringCodeLoader(IOUtils.toString(PLSQLTokenizer.class.getResourceAsStream(FILENAME_ADVANCED)), FILENAME_ADVANCED));
+        this.expectedTokenCount = 121;
         super.tokenizeTest();
     }
 

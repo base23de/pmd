@@ -83,6 +83,7 @@ public class PLSQLTokenizer implements Tokenizer {
 
         String replaced = sb.toString();
         if (skipBlocksPattern != null) {
+            LOGGER.fine("PLSQLTokenizer: skipBlocksPattern==" + skipBlocksPattern.toString());
             replaced = skipBlocksPattern.matcher(replaced).replaceAll(EMPTY_STRING);
         }
 

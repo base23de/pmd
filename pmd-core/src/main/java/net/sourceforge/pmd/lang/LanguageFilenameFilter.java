@@ -21,6 +21,7 @@ import java.util.Set;
 public class LanguageFilenameFilter implements FilenameFilter {
 
     private final Set<Language> languages;
+    private final Set<String> acceptedFileExtensions;
 
     /**
      * Create a LanguageFilenameFilter for a single Language.
@@ -39,7 +40,12 @@ public class LanguageFilenameFilter implements FilenameFilter {
      *            The List of Languages.
      */
     public LanguageFilenameFilter(Set<Language> languages) {
+        this(languages, Collections.<String>emptySet());
+    }
+
+    public LanguageFilenameFilter(Set<Language> languages, Set<String> acceptedFileExtensions) {
         this.languages = languages;
+        this.acceptedFileExtensions = acceptedFileExtensions;
     }
 
     /**
@@ -54,10 +60,18 @@ public class LanguageFilenameFilter implements FilenameFilter {
         }
 
         String extension = name.substring(1 + lastDotIndex).toUpperCase(Locale.ROOT);
-        for (Language language : languages) {
-            for (String ext : language.getExtensions()) {
+        if (!acceptedFileExtensions.isEmpty()) {
+            for (String ext : acceptedFileExtensions) {
                 if (extension.equalsIgnoreCase(ext)) {
                     return true;
+                }
+            }
+        } else {
+            for (Language language : languages) {
+                for (String ext : language.getExtensions()) {
+                    if (extension.equalsIgnoreCase(ext)) {
+                        return true;
+                    }
                 }
             }
         }

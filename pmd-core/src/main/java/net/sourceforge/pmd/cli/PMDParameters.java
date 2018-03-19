@@ -105,6 +105,10 @@ public class PMDParameters {
     @Parameter(names = "-no-cache", description = "Explicitly disable incremental analysis. The '-cache' option is ignored if this switch is present in the command line.")
     private boolean noCache = false;
 
+    @Parameter(names = { "-fileExtensions", "-F" }, description = "Filter source files by these extensions.",
+            required = false)
+    private String fileExtensions;
+    
     // this has to be a public static class, so that JCommander can use it!
     public static class PropertyConverter implements IStringConverter<Properties> {
 
@@ -177,7 +181,8 @@ public class PMDParameters {
         configuration.setFailOnViolation(this.isFailOnViolation());
         configuration.setAnalysisCacheLocation(this.cacheLocation);
         configuration.setIgnoreIncrementalAnalysis(this.isIgnoreIncrementalAnalysis());
-
+        configuration.setFileExtensions(this.getFileExtensions());
+        
         LanguageVersion languageVersion = LanguageRegistry
                 .findLanguageVersionByTerseName(this.getLanguage() + ' ' + this.getVersion());
         if (languageVersion != null) {
@@ -306,6 +311,11 @@ public class PMDParameters {
      */
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+
+    public String getFileExtensions() {
+        return fileExtensions;
     }
 
 }

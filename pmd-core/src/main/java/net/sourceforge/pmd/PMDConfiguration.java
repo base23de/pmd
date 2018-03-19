@@ -106,6 +106,7 @@ public class PMDConfiguration extends AbstractConfiguration {
     private boolean benchmark;
     private AnalysisCache analysisCache = new NoopAnalysisCache();
     private boolean ignoreIncrementalAnalysis;
+    private String fileExtensions;
 
     /**
      * Get the suppress marker. This is the source level marker used to indicate
@@ -623,5 +624,13 @@ public class PMDConfiguration extends AbstractConfiguration {
      */
     public boolean isIgnoreIncrementalAnalysis() {
         return ignoreIncrementalAnalysis;
+    }
+
+    public String getFileExtensions() {
+        return fileExtensions;
+    }
+
+    public void setFileExtensions(String fileExtensions) {
+        this.fileExtensions = fileExtensions;
     }
 }

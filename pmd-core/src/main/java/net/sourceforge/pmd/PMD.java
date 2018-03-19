@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -365,7 +366,15 @@ public class PMD {
 
     private static List<DataSource> internalGetApplicableFiles(PMDConfiguration configuration,
             Set<Language> languages) {
-        LanguageFilenameFilter fileSelector = new LanguageFilenameFilter(languages);
+        
+        
+        final Set<String> acceptedFileExtensions = new HashSet<>();
+        if (configuration.getFileExtensions() != null) {
+            String[] fileExtensions = configuration.getFileExtensions().split("\\s*,\\s*");
+            acceptedFileExtensions.addAll(Arrays.asList(fileExtensions));
+        }
+        
+        LanguageFilenameFilter fileSelector = new LanguageFilenameFilter(languages, acceptedFileExtensions);
         List<DataSource> files = new ArrayList<>();
 
         if (null != configuration.getInputPaths()) {
